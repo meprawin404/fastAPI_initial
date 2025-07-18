@@ -1,5 +1,7 @@
-from sqlalchemy import Column, String, Integer
+from sqlalchemy import Column, Integer, String
+
 from database import BASE
+
 
 class Bikes(BASE):
     __tablename__ = "bikes"
