@@ -19,12 +19,20 @@ def get_db():
         db.close()
 
 
-class Bike(BaseModel):
+class BikeCreate(BaseModel): #for POST request with no ID
     name: str
     brand: str
 
+class BikeResponse(BaseModel): #for Response with ID
+    id: int
+    name: str
+    brand: str
 
-bikes: List[Bike] = []
+    class Config:
+        from_attributes = True  
+
+
+# bikes: List[Bike] = []
 
 
 @app.get("/")
@@ -32,32 +40,17 @@ def read_root():
     return {"msg": "welcome to Bikers"}
 
 
-@app.get("/bikes")
-def get_bikes():
-    return bikes
+@app.get("/bikes", response_model=List[BikeResponse])
+def get_bikes(db: Session = Depends(get_db)):
+    return db.query(models.Bikes).all()
 
 
-@app.post("/bikes")
-def add_bikes(bike: Bike):
-    bikes.append(bike)
-    return bike
+@app.post("/bikes", response_model=BikeResponse)
+def add_bikes(bike: BikeCreate, db: Session = Depends(get_db)):
+    db_bike = models.Bikes(name = bike.name, brand = bike.brand)
+    db.add(db_bike)
+    db.commit()
+    db.refresh(db_bike)
+    return db_bike
 
 
-@app.put("/bikes/{bike_id}")
-def update_bike(bike_id: int, updated_bike: Bike):
-    for index, bike in enumerate(bikes):
-        if bike.id == bike_id:
-            bikes[index] = updated_bike
-            return updated_bike
-
-    return {"error": "bike not find"}
-
-
-@app.delete("/bikes/{bike_id}")
-def delete_bike(bike_id):
-    for index, bike in enumerate(bikes):
-        if bike.id == bike_id:
-            data = bikes.pop(index)
-            return data
-
-    return {"error": "bike not found"}
