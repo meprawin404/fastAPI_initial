@@ -133,6 +133,67 @@ Creates a new bike in the database.
 
 ---
 
+### 4. Update Bike
+**PUT** `/bikes/{bike_id}`
+
+Updates an existing bike by ID.
+
+**Path Parameters:**
+- `bike_id` (integer): The ID of the bike to update
+
+**Request Body:**
+```json
+{
+  "name": "Updated Mountain Bike",
+  "brand": "Trek"
+}
+```
+
+**Response (Success):**
+```json
+{
+  "id": 1,
+  "name": "Updated Mountain Bike",
+  "brand": "Trek"
+}
+```
+
+**Response (Not Found):**
+```json
+{
+  "error": "bike not found"
+}
+```
+
+**Request Model:** `BikeCreate`
+**Response Model:** `BikeResponse`
+
+---
+
+### 5. Delete Bike
+**DELETE** `/bikes/{bike_id}`
+
+Deletes a bike by ID.
+
+**Path Parameters:**
+- `bike_id` (integer): The ID of the bike to delete
+
+**Response (Success):**
+```json
+{
+  "message": "Bike deleted"
+}
+```
+
+**Response (Not Found):**
+```json
+{
+  "error": "bike not found"
+}
+```
+
+---
+
 ## 📝 Data Models
 
 ### BikeCreate (Request Model)
@@ -172,19 +233,42 @@ Used for API responses.
         -d '{"name": "Mountain Bike", "brand": "Trek"}'
    ```
 
+3. **Update a bike:**
+   ```bash
+   curl -X PUT "http://127.0.0.1:8000/bikes/1" \
+        -H "Content-Type: application/json" \
+        -d '{"name": "Updated Mountain Bike", "brand": "Trek"}'
+   ```
+
+4. **Delete a bike:**
+   ```bash
+   curl -X DELETE "http://127.0.0.1:8000/bikes/1"
+   ```
+
 ### Using Python requests
 
 ```python
 import requests
 
+base_url = "http://127.0.0.1:8000"
+
 # Get all bikes
-response = requests.get("http://127.0.0.1:8000/bikes")
-print(response.json())
+response = requests.get(f"{base_url}/bikes")
+print("All bikes:", response.json())
 
 # Create a new bike
 new_bike = {"name": "Road Bike", "brand": "Giant"}
-response = requests.post("http://127.0.0.1:8000/bikes", json=new_bike)
-print(response.json())
+response = requests.post(f"{base_url}/bikes", json=new_bike)
+print("Created bike:", response.json())
+
+# Update a bike (assuming ID 1 exists)
+updated_bike = {"name": "Updated Road Bike", "brand": "Giant"}
+response = requests.put(f"{base_url}/bikes/1", json=updated_bike)
+print("Updated bike:", response.json())
+
+# Delete a bike (assuming ID 1 exists)
+response = requests.delete(f"{base_url}/bikes/1")
+print("Delete response:", response.json())
 ```
 
 ### Using Interactive Documentation
@@ -222,8 +306,6 @@ Key packages used:
 
 Potential improvements for this API:
 
-- [ ] Add UPDATE endpoint (PUT `/bikes/{bike_id}`)
-- [ ] Add DELETE endpoint (DELETE `/bikes/{bike_id}`)
 - [ ] Add GET single bike endpoint (GET `/bikes/{bike_id}`)
 - [ ] Add search and filtering capabilities
 - [ ] Add authentication and authorization
@@ -233,6 +315,8 @@ Potential improvements for this API:
 - [ ] Add unit and integration tests
 - [ ] Add API versioning
 - [ ] Add rate limiting
+- [ ] Add proper HTTP status codes for error responses
+- [ ] Add request/response validation middleware
 
 ## 📜 License
 
